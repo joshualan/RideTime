@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$USER_HOME$/PycharmProjects/VocalRoute/.idea/VocalRoute.iml" filepath="$USER_HOME$/PycharmProjects/VocalRoute/.idea/VocalRoute.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/RideTime.iml" filepath="$PROJECT_DIR$/.idea/RideTime.iml" />
     </modules>
   </component>
 </project>
