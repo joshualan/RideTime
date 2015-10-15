@@ -41,8 +41,34 @@ def makeRequest(origin , destination):
 
     return j
 
-def parseRequest(j):
+def parseRequest(data):
     """
     Takes json response from the Bing Routes API and returns a dictionary of relevant
     information, e.g  route identifier, time took, mileage
     """
+
+    numRoutes = data['resourceSets'][0]['estimatedTotal']
+
+    # Array of dictionaries to be returned
+    routes = []
+
+    for resource in data['resourceSets'][0]['resources']:
+
+        # Time of travel without traffic
+        time = resource['travelDuration']
+
+        # Tuple consists of hours, minutes, and seconds
+        rideTime = (time/3600, (time % 3600)/60, (time % 3600 % 60) )
+
+        # Time of travel with traffic
+        time = resource['travelDurationTraffic']
+
+        # Tuple consists of hours, minutes, and seconds
+        rideTimeTraffic = (time/3600, (time % 3600)/60, (time % 3600 % 60) )
+
+
+        route = {'time': rideTime,
+                 'timeTraffic': rideTimeTraffic,
+                 'congestion': resource['trafficCongestion']}
+
+        routes.append(route)
