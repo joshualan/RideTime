@@ -52,23 +52,41 @@ def parseRequest(data):
     # Array of dictionaries to be returned
     routes = []
 
+    legsInfo = []
+
+    # Start parsing the json file to build the route information
     for resource in data['resourceSets'][0]['resources']:
 
         # Time of travel without traffic
         time = resource['travelDuration']
-
-        # Tuple consists of hours, minutes, and seconds
-        rideTime = (time/3600, (time % 3600)/60, (time % 3600 % 60) )
+        rideTime = {'hours': time/3600, 'minutes': (time % 3600)/60, 'seconds': (time % 3600 % 60)}
 
         # Time of travel with traffic
         time = resource['travelDurationTraffic']
-
-        # Tuple consists of hours, minutes, and seconds
-        rideTimeTraffic = (time/3600, (time % 3600)/60, (time % 3600 % 60) )
-
+        rideTimeTraffic = {'hours': time/3600, 'minutes': (time % 3600)/60, 'seconds': (time % 3600 % 60)}
 
         route = {'time': rideTime,
                  'timeTraffic': rideTimeTraffic,
-                 'congestion': resource['trafficCongestion']}
+                 'congestion': resource['trafficCongestion'],
+                 'description': resource['routeLegs'][0]['description']}
 
         routes.append(route)
+
+        # I'M AN IDIOT AND THIS IS ALL USELESS
+        # # Sort the legs of each route according to travel distance to help
+        # # figure out the unique identifying leg of each route
+        # legs = resource['routeLegs'][0]['itineraryItems']
+        # legs = sorted(legs, key=lambda leg: leg['travelDistance'], reverse=True)
+        #
+        # for leg in legs:
+        #     print leg['travelDistance']
+        #     for detail in leg['details']:
+        #         if 'names' in detail:
+        #             route['longestLeg'] = detail['names'][0]
+        #             break
+        #     if 'travelDistance' in route:
+        #         break
+        #
+        # print route['longestLeg']
+        #
+        # legsInfo.append(legs)
