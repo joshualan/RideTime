@@ -1,7 +1,6 @@
 import bing
-import pyttsx
 import sys
-
+import speech
 
 with open('addresses.txt', 'r') as f:
     addresses = f.readlines()
@@ -14,34 +13,41 @@ request = bing.make_request(origin, destination)
 if request is None:
     sys.exit()
 
-#print request['resourceSets'][0]['estimatedTotal']
+# Produces a list of dictionaries that contain info of each route
+routes = bing.parse_traffic_data(request)
 
-info = bing.parse_request(request)
+# Prepare strings for speech synthesis.
+# TODO: add levels of verbosity
+traffic_strings = []
+for i, route in enumerate(routes):
+    str = ""
+    #congestion = "no" if route['congestion'] != "None" else route['congestion']
+    if i == 0:
+        str += "{} is the fastest route and ".format(route['description'])
+    else:
+        str += "{} ".format(route['description'])
 
-print info
+    str += " will take "
 
-engine = pyttsx.init()
-engine.setProperty('rate', 70)
+    # Convert the time with traffic to a string
+    hours = minutes = 0
+    traffic = route['time_traffic'] 
+    if traffic['hours'] > 0:
+        hours = traffic['hours']
+        str += "{} hours, ".format(hours)
 
-voices = engine.getProperty('voices')
+    if traffic['minutes'] > 0:
+        minutes = traffic['minutes']
+        str += "{} minutes, ".format(minutes)
 
-#for voice in voices:
-#    print "Using voice:", repr(voice)
-#    engine.setProperty('voice', voice.id)
-#    engine.say("Hi there, how's you ?")
+    delay = (hours * 60 + minutes) - (route['time']['hours'] * 60 + route['time']['minutes'])
 
-#    engine.say("Hi there Alan. I am Ride Time.")
+    # Add a delay
+    if delay > 0:
+        str += "which is {} minutes slower than usual.".format(delay)
 
-#    engine.say("Sunday Monday Tuesday Wednesday Thursday Friday Saturday")
-#    engine.say("Violet Indigo Blue Green Yellow Orange Red")
-#    engine.say("Apple Banana Cherry Date Guava")
-#engine.runAndWait()
-
-voices = engine.getProperty('voices')
-for voice in voices:
-    print "Using voice:", repr(voice)
-    print voice.age, voice.gender, voice.languages, voice.name
-
-#    engine.setProperty('voice', voice.id)
-#    engine.say("Hi there, how're you ?")
-#engine.runAndWait()
+    traffic_strings.append(str)
+    
+# Preach the spoken word sir!
+for s in traffic_strings:
+    speech.say(s)
