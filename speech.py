@@ -3,8 +3,8 @@ import pyttsx
 # Initialize the voice engine
 engine = pyttsx.init()
 
-# Set the rate of talking to 65 words per minute
-engine.setProperty('rate', 90)
+# Set the rate of talking to 120 words per minute
+engine.setProperty('rate', 150)
 
 # Try to find a 'Murican voice. If there are no such
 # patriotic voices, any English ones will do. Otherwise,
@@ -20,12 +20,14 @@ for voice in voices:
 if english_voice:
     engine.setProperty('voice', english_voice.id)
                       
-def say(str):
+def say(speeches):
     """
     Send a string to be said to the speech engine and wait
     for it to finish.
     """
-    engine.say(str)
+    for s in speeches:
+        engine.say(s)
+
     engine.runAndWait()
 
 def set_rate(rate):
