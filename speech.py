@@ -22,8 +22,8 @@ if english_voice:
                       
 def say(speeches):
     """
-    Send a string to be said to the speech engine and wait
-    for it to finish.
+    Send a list of strings to be said to the speech engine 
+    and wait for it to finish.
     """
     for s in speeches:
         engine.say(s)

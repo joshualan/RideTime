@@ -3,6 +3,9 @@ import sys
 import speech
 import socket
 
+# Default size for receiving stuff on a socket
+chunk_size = 128
+
 # TODO: Be able to change shit according to name
 def speak_traffic(name):
 
@@ -15,7 +18,7 @@ def speak_traffic(name):
     request = bing.make_request(origin, destination)
 
     if request is None:
-        sys.exit()
+        return None
 
     # Produces a list of dictionaries that contain info of each route
     routes = bing.parse_traffic_data(request)
@@ -56,26 +59,43 @@ def speak_traffic(name):
         traffic_strings.append(str)
     
     # Preach the spoken word sir!
-    # for s in traffic_strings:
-    #    speech.add_speech(s)
-
     speech.say(traffic_strings)
 
 
 def main():
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    # Create an INET, STREAM-ing socket for our server
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    except socket.error as msg:
+        s = None
+        sys.exit(1)
+    
+    try:
+        s.bind(('localhost', 5800))
+        s.listen(1)
+    except socket.error as msg:
+        s.close()
+        s = None
+        sys.exit(1)
 
-    s.bind(('localhost', 12345))
+    # Starting the server!
+    while True:
+        c, addr = s.accept()
 
-    s.listen(1)
+        data = c.recv(chunk_size)
+        
+        if data == "END":
+            c.send('SHUTDOWN')
+            c.close()
+            break
+        elif data:
+            print "Server receives {} from {}:{}!".format(data, addr[0], addr[1])
+            speak_traffic("ALAN")
+            c.send('OK')
+            c.close()
 
-    c, addr = s.accept()
-
-    speak_traffic("ALAN")
-
+    print "Server has had enough of yo shit" 
     s.close()
-
-
 
 if __name__ == '__main__':
     main()
