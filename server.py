@@ -51,8 +51,10 @@ def speak_traffic(name):
                  (route['time']['hours'] * 60 + route['time']['minutes']))
 
         # Add a delay
-        if delay > 0:
-            str += "with {} minutes delay.".format(delay)
+        if delay > 1:
+            str += "which is {} minutes slower than usual.".format(delay)
+        elif delay == 1:
+            str += "which is a minute slower than usual.".format(delay)
         else:
             str += "with no delay."
 
