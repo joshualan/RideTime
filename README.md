@@ -8,7 +8,12 @@ What It Currently Does:
 
 - Gets traffic information from bing!
 - Speech synthesizes the traffic info
+- Recognize voice commands
 
 What It Needs To Do:
-- run and wait on a callback loop.
-- recognize voice commands
+- Listens on a background thread
+- Call a DB to for messages and names
+
+Fringe Goals:
+- Make a front end for updating the DB!
+
