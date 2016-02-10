@@ -8,7 +8,10 @@ chunk_size = 128
 
 # TODO: Be able to change shit according to name
 def speak_traffic(name):
-
+    """
+    Given a name, speak the traffic information configured 
+    for that person.
+    """
     with open('addresses.txt', 'r') as f:
         addresses = f.readlines()
 
@@ -26,15 +29,8 @@ def speak_traffic(name):
     # Prepare strings for speech synthesis.
     # TODO: add levels of verbosity
     traffic_strings = []
-    for i, route in enumerate(routes):
-        str = ""
-    
-        if i == 0:
-            str += "{} is the fastest route and ".format(route['description'])
-        else:
-            str += "{} ".format(route['description'])
-
-        str += " will take "
+    for route in routes:
+        str = "{} will take ".format(route['description'])
 
         # Convert the time with traffic to a string
         hours = minutes = 0
@@ -47,22 +43,17 @@ def speak_traffic(name):
             minutes = traffic['minutes']
             str += "{} minutes, ".format(minutes)
 
-        delay = ((hours * 60 + minutes) - 
-                 (route['time']['hours'] * 60 + route['time']['minutes']))
-
-        # Add a delay
-        if delay > 1:
-            str += "which is {} minutes slower than usual.".format(delay)
-        elif delay == 1:
-            str += "which is a minute slower than usual.".format(delay)
-        else:
-            str += "with no delay."
+        # Note the normal time
+        str += "normally {} minutes.".format(delay)
 
         traffic_strings.append(str)
     
     # Preach the spoken word sir!
     speech.say(traffic_strings)
 
+def speak_confirmation():
+    "Confirms that the app is in listening mode."
+    speech.say('Ride Time is listening.')
 
 def main():
     # Create an INET, STREAM-ing socket for our server
@@ -80,6 +71,8 @@ def main():
         s = None
         sys.exit(1)
 
+    listening = False
+
     # Starting the server!
     while True:
         c, addr = s.accept()
@@ -90,11 +83,26 @@ def main():
             c.send('SHUTDOWN')
             c.close()
             break
+
+
+        
+
+
+        names = ['ALAN', "ALLEN", 'COREY', 'PJ']
+        l = [name for name in names if "TRAFFIC FOR {}".format(name) in data]
+        if len(l) == 1:
+            print "Traffic for {}".format(l[0])
+            speak_traffic(l[0])
+
+        elif len(l) > 1:
+            speech.say("Ambiguous request.")
+
         elif data:
             print "Server receives {} from {}:{}!".format(data, addr[0], addr[1])
-            speak_traffic("ALAN")
-            c.send('OK')
-            c.close()
+            # speak_traffic("ALAN")
+            
+        c.send('OK')
+        c.close()
 
     print "Server has had enough of yo shit" 
     s.close()
