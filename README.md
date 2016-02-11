@@ -12,6 +12,8 @@ What It Currently Does:
 
 What It Needs To Do:
 - Listens on a background thread
+- - Looking up Natural Language Processing for Parsing Speech
+- - https://spacy.io/blog/parsing-english-in-python
 - Call a DB to for messages and names
 
 Fringe Goals:
