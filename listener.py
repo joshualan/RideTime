@@ -1,6 +1,36 @@
 import socket
 import speech_recognition as sr
 
+def send_message(data):
+    """ 
+    Sends the data to the server and then returns its 
+    response. Will block while waiting for response.
+    
+    TODO: Add a timeout to the receive data?
+    """
+    #create an INET, STREAMing socket
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    except socket.error as msg:
+        # Log something like server error?
+        s = None
+        break
+
+    try:
+        s.connect(('localhost',5800))
+        s.sendall(data)
+        # Wait for a response from the server so we don't
+        # get input from the mic while the speaker is still
+        # talking.
+        response = s.recv(chunk_size)
+    except socket.error as msg:
+        # Log something like server error
+        s.close()
+        break
+
+    # Close the socket. It's a one time use.
+    s.close()
+
 def callback(recognizer, audio):
     # received audio data, now we'll recognize it using Google Speech Recognition
     try:
@@ -12,26 +42,13 @@ def callback(recognizer, audio):
     except sr.RequestError as e:
         print("Could not request results from Google Speech Recognition service; {0}".format(e))
 
-    if "Ride Time" in str:
+    if str == "Ride Time" :
+        send_message("LISTEN")
+        
+    elif "Ride Time" in str:
         pass
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    else:
+        send_message("REPEAT")
 
 # Default size for receiving stuff on a socket
 chunk_size = 128
@@ -65,28 +82,7 @@ while True:
 
     data = data.upper()
 
-    #create an INET, STREAMing socket
-    try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    except socket.error as msg:
-        # Log something like server error?
-        s = None
-        break
-
-    try:
-        s.connect(('localhost',5800))
-        s.sendall(data)
-        # Wait for a response from the server so we don't
-        # get input from the mic while the speaker is still
-        # talking.
-        response = s.recv(chunk_size)
-    except socket.error as msg:
-        # Log something like server error
-        s.close()
-        break
-
-    # Close the socket. It's a one time use.
-    s.close()
+    response = send_message(data)
 
     # If we said END, break
     if data == "END":
